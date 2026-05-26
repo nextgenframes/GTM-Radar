@@ -61,7 +61,7 @@ function Panel({
     <motion.section
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-xl shadow-slate-200/50 dark:border-white/10 dark:bg-white/[0.055] dark:shadow-black/15"
+      className="rounded-[1.25rem] border border-slate-200 bg-white p-4 shadow-xl shadow-slate-200/50 dark:border-white/10 dark:bg-white/[0.055] dark:shadow-black/15 sm:rounded-[1.5rem] sm:p-5"
     >
       <div className="flex items-center gap-2">
         <span className="rounded-2xl bg-blue-500/10 p-2 text-blue-700 dark:text-blue-200">{icon}</span>
@@ -116,7 +116,7 @@ export function CommandCenter() {
           <input
             value={idea}
             onChange={(event) => setIdea(event.target.value)}
-            className="min-h-12 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-950 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 dark:border-white/10 dark:bg-white/[0.07] dark:text-white"
+            className="min-h-12 min-w-0 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-950 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 dark:border-white/10 dark:bg-white/[0.07] dark:text-white"
             placeholder="Describe startup idea"
           />
           <button className="rounded-2xl bg-gradient-to-r from-blue-500 to-violet-500 px-5 py-3 text-sm font-semibold text-white">
@@ -134,7 +134,7 @@ export function CommandCenter() {
 
       <section className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
         <Panel title="Guided workflow mode" icon={<ClipboardCheck className="size-4" />}>
-          <div className="grid gap-3 md:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {workflow.map(([step, title, body]) => (
               <div key={step} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-slate-950/35">
                 <span className="grid size-8 place-items-center rounded-full bg-slate-950 text-sm font-bold text-white dark:bg-white dark:text-slate-950">
@@ -148,7 +148,7 @@ export function CommandCenter() {
         </Panel>
 
         <Panel title="Launch readiness score" icon={<ShieldCheck className="size-4" />}>
-          <div className="flex items-center gap-5">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
             <div
               className="grid size-28 place-items-center rounded-full"
               style={{ background: "conic-gradient(#6366f1 79%, rgba(148,163,184,.25) 79%)" }}
@@ -168,7 +168,7 @@ export function CommandCenter() {
         </Panel>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-3">
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <Panel title="Live market signals" icon={<Radar className="size-4" />}>
           <div className="space-y-3">
             {signals.map(([severity, signal, confidence]) => (

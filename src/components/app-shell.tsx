@@ -85,16 +85,16 @@ export function AppShell({
         </div>
       </aside>
 
-      <section className="lg:pl-72">
+      <section className="pb-24 lg:pb-0 lg:pl-72">
         <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/70 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/60">
-          <div className="flex flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-            <div>
+          <div className="flex flex-col gap-3 px-3 py-3 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+            <div className="min-w-0">
               <div className="text-xs text-slate-500 dark:text-slate-400">
                 LaunchPilot AI / <span className="text-slate-800 dark:text-slate-200">{titleFromPath(pathname)}</span>
               </div>
-              <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950 dark:text-white">{title}</h1>
+              <h1 className="mt-1 truncate text-xl font-semibold tracking-tight text-slate-950 dark:text-white sm:text-2xl">{title}</h1>
             </div>
-            <div className="flex items-center gap-2 overflow-x-auto lg:hidden">
+            <div className="-mx-1 flex items-center gap-2 overflow-x-auto px-1 pb-1 lg:hidden">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
@@ -105,7 +105,7 @@ export function AppShell({
                 </Link>
               ))}
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <ThemeToggle />
               <Link
                 href="/research"
@@ -121,15 +121,36 @@ export function AppShell({
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.28 }}
-          className="space-y-6 px-4 py-6 sm:px-6 lg:px-8"
+          className="space-y-5 px-3 py-4 sm:space-y-6 sm:px-6 sm:py-6 lg:px-8"
         >
-          <section className="rounded-[2rem] border border-slate-200 bg-white/75 p-6 shadow-xl shadow-slate-200/50 backdrop-blur dark:border-white/10 dark:bg-white/[0.04] dark:shadow-black/20">
+          <section className="rounded-[1.5rem] border border-slate-200 bg-white/75 p-4 shadow-xl shadow-slate-200/50 backdrop-blur dark:border-white/10 dark:bg-white/[0.04] dark:shadow-black/20 sm:rounded-[2rem] sm:p-6">
             <p className="text-sm font-medium text-blue-700 dark:text-blue-200">AI chief of staff for startup growth</p>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600 dark:text-slate-300">{description}</p>
           </section>
           {children}
         </motion.div>
       </section>
+
+      <nav className="fixed inset-x-3 bottom-3 z-40 grid grid-cols-4 gap-1 rounded-[1.25rem] border border-slate-200 bg-white/90 p-2 shadow-2xl shadow-slate-300/40 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/90 dark:shadow-black/40 lg:hidden">
+        {navItems.slice(0, 4).map((item) => {
+          const Icon = item.icon;
+          const active = pathname === item.href;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-semibold ${
+                active
+                  ? "bg-slate-950 text-white dark:bg-white dark:text-slate-950"
+                  : "text-slate-500 dark:text-slate-300"
+              }`}
+            >
+              <Icon className="size-4" />
+              {item.label.split(" ")[0]}
+            </Link>
+          );
+        })}
+      </nav>
     </main>
   );
 }

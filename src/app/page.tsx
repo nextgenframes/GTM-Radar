@@ -13,9 +13,9 @@ const features = [
 export default function LandingPage() {
   return (
     <main className="min-h-screen text-white">
-      <section className="mx-auto flex max-w-7xl flex-col gap-12 px-4 py-10 sm:px-6 lg:px-8">
+      <section className="mx-auto flex max-w-7xl flex-col gap-10 px-3 py-6 sm:gap-12 sm:px-6 sm:py-10 lg:px-8">
         <nav className="flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold tracking-tight">LaunchPilot AI</Link>
+          <Link href="/" className="text-lg font-bold tracking-tight sm:text-xl">LaunchPilot AI</Link>
           <Link href="/dashboard" className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/15">
             Open app
           </Link>
@@ -27,10 +27,10 @@ export default function LandingPage() {
               Live web intelligence for startup launches
             </span>
             <div className="space-y-5">
-              <h1 className="max-w-4xl text-5xl font-semibold leading-[1.02] tracking-tight sm:text-7xl">
+              <h1 className="max-w-4xl text-4xl font-semibold leading-[1.04] tracking-tight sm:text-6xl lg:text-7xl">
                 Turn live web data into a go-to-market plan.
               </h1>
-              <p className="max-w-2xl text-lg leading-8 text-slate-300">
+              <p className="max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
                 LaunchPilot AI uses web intelligence agents to find competitors, customer pain points, ICPs, and launch strategies in minutes.
               </p>
             </div>
@@ -44,9 +44,9 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.06] p-4 shadow-2xl shadow-blue-950/40 backdrop-blur">
-            <div className="rounded-[1.5rem] bg-slate-950/80 p-5">
-              <div className="flex items-center justify-between">
+          <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.06] p-3 shadow-2xl shadow-blue-950/40 backdrop-blur sm:rounded-[2rem] sm:p-4">
+            <div className="rounded-[1.25rem] bg-slate-950/80 p-4 sm:rounded-[1.5rem] sm:p-5">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm font-semibold">Opportunity score</p>
                 <span className="rounded-full bg-emerald-400/10 px-3 py-1 text-xs text-emerald-200">Demo preview</span>
               </div>
@@ -82,7 +82,7 @@ export default function LandingPage() {
           })}
         </section>
 
-        <section className="rounded-[2rem] border border-white/10 bg-white/[0.05] p-6">
+        <section className="rounded-[1.5rem] border border-white/10 bg-white/[0.05] p-4 sm:rounded-[2rem] sm:p-6">
           <div className="flex items-center gap-2 text-sm font-semibold text-blue-200">
             <Sparkles className="size-4" /> Features
           </div>
@@ -96,8 +96,8 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="rounded-[2rem] bg-gradient-to-r from-blue-500 to-violet-500 p-8 text-center">
-          <h2 className="text-3xl font-semibold">Ready to turn idea into launch plan?</h2>
+        <section className="rounded-[1.5rem] bg-gradient-to-r from-blue-500 to-violet-500 p-6 text-center sm:rounded-[2rem] sm:p-8">
+          <h2 className="text-2xl font-semibold sm:text-3xl">Ready to turn idea into launch plan?</h2>
           <p className="mx-auto mt-3 max-w-2xl text-blue-50">Run one analysis, then move from market signal to ICP, strategy, and content without switching tools.</p>
           <Link href="/research" className="mt-6 inline-flex rounded-2xl bg-white px-6 py-3 font-semibold text-slate-950">
             Analyze Startup Idea
