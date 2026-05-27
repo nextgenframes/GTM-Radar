@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { buildStrategy, demoData, normalizeIdea } from "@/lib/gtm";
+import { aiStrategy, buildStrategy, demoData, getResearchData, normalizeIdea } from "@/lib/gtm";
 
 export async function POST(request: Request) {
   let idea = "your startup idea";
@@ -9,7 +9,8 @@ export async function POST(request: Request) {
     idea = normalizeIdea(body.idea);
     if (!idea) return NextResponse.json({ error: "Startup idea is required." }, { status: 400 });
 
-    return NextResponse.json({ strategy: buildStrategy(idea), isDemoFallback: false });
+    const { corpus } = await getResearchData(idea);
+    return NextResponse.json({ strategy: (await aiStrategy(idea, corpus)) ?? buildStrategy(idea, corpus), isDemoFallback: false });
   } catch (error) {
     return NextResponse.json(demoData(idea, "strategy", error instanceof Error ? error.message : "Unknown error."));
   }

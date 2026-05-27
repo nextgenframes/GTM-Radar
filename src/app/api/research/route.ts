@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { buildResearchResult, demoResearch, getResearchData, normalizeIdea } from "@/lib/gtm";
+import { aiResearchResult, buildResearchResult, demoResearch, getResearchData, normalizeIdea } from "@/lib/gtm";
 
 export async function POST(request: Request) {
   let idea = "your startup idea";
@@ -13,7 +13,8 @@ export async function POST(request: Request) {
     }
 
     const { sourceUrls, corpus } = await getResearchData(idea);
-    return NextResponse.json(buildResearchResult(idea, sourceUrls, corpus));
+    const aiResult = await aiResearchResult(idea, sourceUrls, corpus);
+    return NextResponse.json(aiResult ?? buildResearchResult(idea, sourceUrls, corpus));
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown research error.";
     return NextResponse.json(demoResearch(idea, message));

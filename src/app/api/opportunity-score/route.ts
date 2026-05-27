@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { buildOpportunityScore, demoData, getResearchData, normalizeIdea } from "@/lib/gtm";
+import { aiOpportunityScore, buildOpportunityScore, demoData, getResearchData, normalizeIdea } from "@/lib/gtm";
 
 export async function POST(request: Request) {
   let idea = "your startup idea";
@@ -11,7 +11,7 @@ export async function POST(request: Request) {
 
     const { corpus } = await getResearchData(idea);
     return NextResponse.json({
-      opportunityScore: buildOpportunityScore(corpus),
+      opportunityScore: (await aiOpportunityScore(idea, corpus)) ?? buildOpportunityScore(corpus, idea),
       isDemoFallback: false,
     });
   } catch (error) {
