@@ -394,7 +394,7 @@ export function GtmWorkbench({ type, title, description, placeholder, prefillIde
 
       {result?.isDemoFallback ? (
         <div className="rounded-[1.5rem] border border-amber-400/20 bg-amber-400/10 p-4 text-sm text-amber-100">
-          Demo fallback shown. Bright Data request failed or env vars missing.
+          Demo fallback shown. A data or AI request failed, or required env vars are missing.
           {result.error ? ` ${result.error}` : ""}
         </div>
       ) : null}
