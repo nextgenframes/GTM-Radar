@@ -48,6 +48,7 @@ async function openRouterChat(prompt: string, jsonMode: boolean) {
       ...(jsonMode ? { response_format: { type: "json_object" } } : {}),
     }),
     cache: "no-store",
+    signal: AbortSignal.timeout(12000),
   });
 
   const payload = (await response.json()) as OpenRouterResponse;

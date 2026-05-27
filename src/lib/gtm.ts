@@ -177,20 +177,37 @@ export async function getResearchData(idea: string) {
     `${idea} customer pain points`,
   ]);
   const sourceUrls = uniqueUrls(serpItems);
-  const pageText = await scrapeUrls(sourceUrls.slice(0, 4));
+  const pageText = await scrapeUrls(sourceUrls.slice(0, 2));
   return { serpItems, sourceUrls, pageText, corpus: `${serpText(serpItems)} ${pageText.join(" ")}` };
+}
+
+function fallbackCompetitorUrls(idea: string): string[] {
+  const text = idea.toLowerCase();
+
+  if (/auto|vehicle|car|repair|mechanic|dealership/.test(text)) {
+    return ["https://www.shopmonkey.io/", "https://www.tekmetric.com/", "https://www.shop-ware.com/", "https://www.repairpal.com/"];
+  }
+
+  if (/clinic|patient|medical|dental|therapy|health/.test(text)) {
+    return ["https://www.zocdoc.com/", "https://www.simplepractice.com/", "https://www.getweave.com/", "https://www.athenahealth.com/"];
+  }
+
+  if (/developer|api|devtool|github|code|engineer/.test(text)) {
+    return ["https://www.postman.com/", "https://www.gitbook.com/", "https://www.sentry.io/", "https://www.datadoghq.com/"];
+  }
+
+  if (/creator|content|newsletter|podcast|influencer|video/.test(text)) {
+    return ["https://www.convertkit.com/", "https://substack.com/", "https://www.canva.com/", "https://www.buffer.com/"];
+  }
+
+  return ["https://www.hubspot.com/", "https://www.clay.com/", "https://www.apollo.io/", "https://www.salesforce.com/"];
 }
 
 export function buildCompetitors(idea: string, sourceUrls: string[]): Competitor[] {
   const urls =
     sourceUrls.length > 0
       ? sourceUrls.slice(0, 6)
-      : [
-          "https://www.perplexity.ai/",
-          "https://www.clay.com/",
-          "https://tavily.com/",
-          "https://www.similarweb.com/",
-        ];
+      : fallbackCompetitorUrls(idea);
 
   return urls.map((url) => {
     const name = domainName(url);
@@ -200,6 +217,28 @@ export function buildCompetitors(idea: string, sourceUrls: string[]): Competitor
       positioning: `${name} competes near "${idea}" through speed, data access, or workflow automation.`,
       pricingPageUrl: `${url.replace(/\/$/, "")}/pricing`,
       notes: "Validate pricing page, ICP language, integrations, and proof points before outreach.",
+    };
+  });
+}
+
+export async function aiCompetitors(idea: string, corpus = ""): Promise<Competitor[] | null> {
+  const fallback = buildCompetitors(idea, []);
+  const data = await safeAiJson<{ competitors?: Partial<Competitor>[] }>(`${contextPrompt(idea, corpus)}
+
+Return JSON shape:
+{"competitors":[{"name":"competitor name","url":"https://example.com","positioning":"specific positioning","pricingPageUrl":"https://example.com/pricing","notes":"specific validation note"}]}`);
+
+  if (!data?.competitors?.length) return null;
+
+  return data.competitors.slice(0, 6).map((competitor, index) => {
+    const fallbackCompetitor = fallback[index % fallback.length];
+    const url = asString(competitor.url, fallbackCompetitor.url);
+    return {
+      name: asString(competitor.name, domainName(url)),
+      url,
+      positioning: asString(competitor.positioning, fallbackCompetitor.positioning),
+      pricingPageUrl: asString(competitor.pricingPageUrl, `${url.replace(/\/$/, "")}/pricing`),
+      notes: asString(competitor.notes, "Validate source, pricing, ICP language, and proof points before outreach."),
     };
   });
 }
