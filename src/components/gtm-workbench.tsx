@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowUpRight, CheckCircle2, Info, Loader2, Search, Sparkles } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, Download, Info, Loader2, Save, Search, Sparkles } from "lucide-react";
 
 type WorkbenchType =
   | "research"
@@ -25,6 +25,13 @@ type WorkbenchProps = {
 type ApiResult = Record<string, unknown> & {
   isDemoFallback?: boolean;
   error?: string;
+};
+
+type StoredAnalysis = {
+  type: WorkbenchType;
+  idea: string;
+  result: ApiResult;
+  savedAt: string;
 };
 
 const progressSteps = [
@@ -304,6 +311,21 @@ export function GtmWorkbench({ type, title, description, placeholder, prefillIde
   const endpoint = useMemo(() => `/api/${type}`, [type]);
   const didAutoSubmit = useRef(false);
 
+  function latestKey() {
+    return `launchpilot-latest-${type}`;
+  }
+
+  function persistResult(ideaToSave: string, data: ApiResult) {
+    const stored: StoredAnalysis = {
+      type,
+      idea: ideaToSave,
+      result: data,
+      savedAt: new Date().toISOString(),
+    };
+    window.localStorage.setItem(latestKey(), JSON.stringify(stored));
+    window.localStorage.setItem("launchpilot-current-idea", ideaToSave);
+  }
+
   async function runAnalysis(ideaToAnalyze: string) {
     if (!ideaToAnalyze.trim()) return;
     setError(null);
@@ -317,7 +339,9 @@ export function GtmWorkbench({ type, title, description, placeholder, prefillIde
       });
       const data = (await response.json()) as ApiResult | { error: string };
       if (!response.ok) throw new Error("error" in data ? data.error : "Request failed.");
-      setResult(data as ApiResult);
+      const nextResult = data as ApiResult;
+      setResult(nextResult);
+      persistResult(ideaToAnalyze, nextResult);
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Request failed.");
     } finally {
@@ -326,6 +350,22 @@ export function GtmWorkbench({ type, title, description, placeholder, prefillIde
   }
 
   useEffect(() => {
+    const saved = window.localStorage.getItem(latestKey());
+    if (!prefillIdea && saved) {
+      try {
+        const stored = JSON.parse(saved) as StoredAnalysis;
+        setIdea(stored.idea);
+        setResult(stored.result);
+      } catch {
+        window.localStorage.removeItem(latestKey());
+      }
+    }
+
+    if (!prefillIdea) {
+      const currentIdea = window.localStorage.getItem("launchpilot-current-idea");
+      if (currentIdea) setIdea((existing) => existing || currentIdea);
+    }
+
     if (prefillIdea && !didAutoSubmit.current) {
       didAutoSubmit.current = true;
       runAnalysis(prefillIdea);
@@ -336,6 +376,32 @@ export function GtmWorkbench({ type, title, description, placeholder, prefillIde
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     await runAnalysis(idea);
+  }
+
+  function saveReport() {
+    if (!result) return;
+    const stored: StoredAnalysis = {
+      type,
+      idea,
+      result,
+      savedAt: new Date().toISOString(),
+    };
+    const saved = window.localStorage.getItem("launchpilot-saved-analyses");
+    const existing = saved ? (JSON.parse(saved) as StoredAnalysis[]) : [];
+    window.localStorage.setItem("launchpilot-saved-analyses", JSON.stringify([stored, ...existing].slice(0, 20)));
+  }
+
+  function downloadReport() {
+    if (!result) return;
+    const blob = new Blob([JSON.stringify({ type, idea, result, savedAt: new Date().toISOString() }, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `launchpilot-${type}-${idea.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "analysis"}.json`;
+    anchor.click();
+    URL.revokeObjectURL(url);
   }
 
   return (
@@ -401,8 +467,26 @@ export function GtmWorkbench({ type, title, description, placeholder, prefillIde
 
       {result ? (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-emerald-700 dark:text-emerald-200">
-            <CheckCircle2 className="size-4" /> Analysis ready
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2 text-sm font-semibold text-emerald-700 dark:text-emerald-200">
+              <CheckCircle2 className="size-4" /> Analysis ready
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={saveReport}
+                className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 dark:border-white/10 dark:bg-white/10 dark:text-white"
+              >
+                <Save className="size-4" /> Save
+              </button>
+              <button
+                type="button"
+                onClick={downloadReport}
+                className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-500 to-violet-500 px-3 py-2 text-sm font-semibold text-white"
+              >
+                <Download className="size-4" /> Download
+              </button>
+            </div>
           </div>
           <RenderResult type={type} result={result} />
         </motion.div>
