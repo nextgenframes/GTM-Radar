@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowUpRight, CheckCircle2, Info, Loader2, Search, Sparkles } from "lucide-react";
 
@@ -19,6 +19,7 @@ type WorkbenchProps = {
   title: string;
   description: string;
   placeholder?: string;
+  prefillIdea?: string;
 };
 
 type ApiResult = Record<string, unknown> & {
@@ -295,24 +296,24 @@ function LoadingState() {
   );
 }
 
-export function GtmWorkbench({ type, title, description, placeholder }: WorkbenchProps) {
-  const [idea, setIdea] = useState("");
+export function GtmWorkbench({ type, title, description, placeholder, prefillIdea }: WorkbenchProps) {
+  const [idea, setIdea] = useState(prefillIdea ?? "");
   const [result, setResult] = useState<ApiResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const endpoint = useMemo(() => `/api/${type}`, [type]);
+  const didAutoSubmit = useRef(false);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function runAnalysis(ideaToAnalyze: string) {
+    if (!ideaToAnalyze.trim()) return;
     setError(null);
     setResult(null);
     setIsLoading(true);
-
     try {
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idea }),
+        body: JSON.stringify({ idea: ideaToAnalyze }),
       });
       const data = (await response.json()) as ApiResult | { error: string };
       if (!response.ok) throw new Error("error" in data ? data.error : "Request failed.");
@@ -322,6 +323,19 @@ export function GtmWorkbench({ type, title, description, placeholder }: Workbenc
     } finally {
       setIsLoading(false);
     }
+  }
+
+  useEffect(() => {
+    if (prefillIdea && !didAutoSubmit.current) {
+      didAutoSubmit.current = true;
+      runAnalysis(prefillIdea);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    await runAnalysis(idea);
   }
 
   return (

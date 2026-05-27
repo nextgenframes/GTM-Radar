@@ -123,7 +123,7 @@ export function CommandCenter() {
           />
           <button
             type="button"
-            onClick={() => router.push(`/research`)}
+            onClick={() => router.push(`/research?idea=${encodeURIComponent(idea.trim())}`)}
             className="rounded-2xl bg-gradient-to-r from-blue-500 to-violet-500 px-5 py-3 text-sm font-semibold text-white"
           >
             Analyze Startup Idea
