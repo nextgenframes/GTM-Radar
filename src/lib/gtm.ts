@@ -1,5 +1,5 @@
 import { brightDataRequest } from "@/lib/brightdata";
-import { geminiJson } from "@/lib/gemini";
+import { openRouterJson } from "@/lib/openrouter";
 
 export type SerpResult = {
   title?: string;
@@ -401,9 +401,9 @@ function contextPrompt(idea: string, corpus = "") {
   ].join("\n\n");
 }
 
-async function safeGeminiJson<T>(prompt: string): Promise<T | null> {
+async function safeAiJson<T>(prompt: string): Promise<T | null> {
   try {
-    return await geminiJson<T>(prompt);
+    return await openRouterJson<T>(prompt);
   } catch {
     return null;
   }
@@ -411,7 +411,7 @@ async function safeGeminiJson<T>(prompt: string): Promise<T | null> {
 
 export async function aiPainPoints(idea: string, corpus: string): Promise<PainPoint[] | null> {
   const fallback = buildPainPoints(corpus);
-  const data = await safeGeminiJson<{ painPoints?: Partial<PainPoint>[] }>(`${contextPrompt(idea, corpus)}
+  const data = await safeAiJson<{ painPoints?: Partial<PainPoint>[] }>(`${contextPrompt(idea, corpus)}
 
 Return JSON shape:
 {"painPoints":[{"theme":"specific pain theme","severity":"Low|Medium|High","frequency":0-100,"examples":["buyer quote-like example","operational symptom"]}]}`);
@@ -428,7 +428,7 @@ Return JSON shape:
 
 export async function aiIcp(idea: string, corpus = ""): Promise<IcpProfile | null> {
   const fallback = buildIcp(idea, corpus);
-  const data = await safeGeminiJson<Partial<IcpProfile>>(`${contextPrompt(idea, corpus)}
+  const data = await safeAiJson<Partial<IcpProfile>>(`${contextPrompt(idea, corpus)}
 
 Return JSON shape:
 {"jobTitles":[],"industries":[],"companySize":"","painPoints":[],"buyingTriggers":[],"objections":[],"whereToReach":[]}`);
@@ -448,7 +448,7 @@ Return JSON shape:
 
 export async function aiStrategy(idea: string, corpus = ""): Promise<StrategyPlan | null> {
   const fallback = buildStrategy(idea, corpus);
-  const data = await safeGeminiJson<Partial<StrategyPlan>>(`${contextPrompt(idea, corpus)}
+  const data = await safeAiJson<Partial<StrategyPlan>>(`${contextPrompt(idea, corpus)}
 
 Return JSON shape:
 {"positioning":"","channels":[],"thirtyDayLaunchPlan":[],"contentIdeas":[],"coldEmailAngle":"","successMetrics":[]}`);
@@ -467,7 +467,7 @@ Return JSON shape:
 
 export async function aiContent(idea: string, corpus = ""): Promise<ContentPack | null> {
   const fallback = buildContent(idea, corpus);
-  const data = await safeGeminiJson<Partial<ContentPack>>(`${contextPrompt(idea, corpus)}
+  const data = await safeAiJson<Partial<ContentPack>>(`${contextPrompt(idea, corpus)}
 
 Return JSON shape:
 {"linkedInPost":"","coldEmail":"","landingPageHero":{"headline":"","subheadline":"","cta":""},"productHuntLaunchCopy":"","shortDemoScript":[]}`);
@@ -490,7 +490,7 @@ Return JSON shape:
 
 export async function aiOpportunityScore(idea: string, corpus: string): Promise<OpportunityScore | null> {
   const fallback = buildOpportunityScore(corpus, idea);
-  const data = await safeGeminiJson<Partial<OpportunityScore>>(`${contextPrompt(idea, corpus)}
+  const data = await safeAiJson<Partial<OpportunityScore>>(`${contextPrompt(idea, corpus)}
 
 Return JSON shape:
 {"total":0-100,"categories":[{"name":"Demand","score":0-100,"explanation":"specific reason"}]}`);
@@ -509,7 +509,7 @@ Return JSON shape:
 
 export async function aiResearchResult(idea: string, sourceUrls: string[], corpus: string): Promise<ResearchResult | null> {
   const fallback = buildResearchResult(idea, sourceUrls, corpus);
-  const data = await safeGeminiJson<Partial<ResearchResult>>(`${contextPrompt(idea, corpus)}
+  const data = await safeAiJson<Partial<ResearchResult>>(`${contextPrompt(idea, corpus)}
 
 Return JSON shape:
 {"competitors":[],"marketSignals":[],"customerPainPoints":[],"positioningIdeas":[],"recommendedGtmStrategy":[]}`);
