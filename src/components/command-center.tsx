@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -201,8 +202,18 @@ export function CommandCenter() {
 
         <Panel title="Quick actions" icon={<Plus className="size-4" />}>
           <div className="grid gap-2">
-            {["Generate outreach angle", "Create Product Hunt copy", "Find competitor gaps", "Build launch checklist"].map((action) => (
-              <button key={action} className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-left text-sm font-medium text-slate-700 transition hover:border-blue-300 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-200">
+            {([
+              ["Generate outreach angle", "/strategy"],
+              ["Create Product Hunt copy", "/content"],
+              ["Find competitor gaps", "/competitors"],
+              ["Build launch checklist", "/strategy"],
+            ] as const).map(([action, href]) => (
+              <button
+                key={action}
+                type="button"
+                onClick={() => router.push(`${href}?idea=${encodeURIComponent(idea.trim())}`)}
+                className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-left text-sm font-medium text-slate-700 transition hover:border-blue-300 dark:border-white/10 dark:bg-slate-950/35 dark:text-slate-200"
+              >
                 {action}
               </button>
             ))}
@@ -239,10 +250,14 @@ export function CommandCenter() {
           {projects.length ? (
             <div className="space-y-2">
               {projects.map((project) => (
-                <div key={project.id} className="rounded-2xl bg-slate-50 p-3 dark:bg-slate-950/35">
+                <Link
+                  key={project.id}
+                  href={`/research?idea=${encodeURIComponent(project.idea)}`}
+                  className="block rounded-2xl bg-slate-50 p-3 transition hover:bg-slate-100 dark:bg-slate-950/35 dark:hover:bg-slate-950/60"
+                >
                   <p className="font-semibold text-slate-950 dark:text-white">{project.name}</p>
                   <p className="text-sm text-slate-500 dark:text-slate-400">{project.idea}</p>
-                </div>
+                </Link>
               ))}
             </div>
           ) : (
