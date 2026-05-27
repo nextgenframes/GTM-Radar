@@ -21,11 +21,21 @@ function readGeminiText(payload: GeminiResponse): string {
     .trim();
 }
 
+function geminiModelName(): string {
+  const configured = (process.env.GEMINI_MODEL ?? "gemini-2.5-flash").replace(/^models\//, "");
+
+  if (configured === "gemini-2.0-flash") {
+    return "gemini-2.5-flash";
+  }
+
+  return configured;
+}
+
 export async function geminiJson<T>(prompt: string): Promise<T | null> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return null;
 
-  const model = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
+  const model = geminiModelName();
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
     {
