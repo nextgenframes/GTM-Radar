@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   BarChart3,
+  DatabaseZap,
   FileText,
   Home,
   Lightbulb,
@@ -14,6 +15,7 @@ import {
   Target,
   Users,
 } from "lucide-react";
+import { SourceIndicator } from "@/components/source-status";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const navItems = [
@@ -24,6 +26,7 @@ const navItems = [
   { label: "ICP", href: "/icp", icon: Users },
   { label: "Strategy", href: "/strategy", icon: Target },
   { label: "Content", href: "/content", icon: FileText },
+  { label: "Sources", href: "/sources", icon: DatabaseZap },
   { label: "Settings", href: "/settings", icon: Settings },
 ];
 
@@ -107,6 +110,7 @@ export function AppShell({
             </div>
             <div className="flex flex-wrap gap-2">
               <ThemeToggle />
+              <SourceIndicator />
               <Link
                 href="/research"
                 className="hidden rounded-2xl bg-gradient-to-r from-blue-500 to-violet-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:scale-[1.02] lg:inline-flex"
