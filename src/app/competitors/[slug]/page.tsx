@@ -17,9 +17,9 @@ export default async function CompetitorDetailPage({
           ["Pricing", "Check /pricing, free trial, usage-based limits, and sales-led plan language."],
           ["Gaps", "Look for weak citations, slow setup, shallow ICP guidance, or missing launch assets."],
         ].map(([title, body]) => (
-          <section key={title} className="rounded-[1.5rem] border border-white/10 bg-white/[0.055] p-5 shadow-xl shadow-black/15">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-300">{title}</h2>
-            <p className="mt-3 text-sm leading-6 text-slate-300">{body}</p>
+          <section key={title} className="rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-xl shadow-slate-200/50 dark:border-white/10 dark:bg-white/[0.055] dark:shadow-black/15">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">{title}</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-700 dark:text-slate-300">{body}</p>
           </section>
         ))}
       </div>

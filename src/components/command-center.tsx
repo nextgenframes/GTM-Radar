@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Activity,
@@ -84,6 +85,7 @@ function ConfidenceBar({ value }: { value: number }) {
 }
 
 export function CommandCenter() {
+  const router = useRouter();
   const [idea, setIdea] = useState("AI chief of staff for startup growth");
   const [projects, setProjects] = useState<SavedProject[]>([]);
   const [openInsight, setOpenInsight] = useState("recommendations");
@@ -119,7 +121,11 @@ export function CommandCenter() {
             className="min-h-12 min-w-0 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-950 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 dark:border-white/10 dark:bg-white/[0.07] dark:text-white"
             placeholder="Describe startup idea"
           />
-          <button className="rounded-2xl bg-gradient-to-r from-blue-500 to-violet-500 px-5 py-3 text-sm font-semibold text-white">
+          <button
+            type="button"
+            onClick={() => router.push(`/research`)}
+            className="rounded-2xl bg-gradient-to-r from-blue-500 to-violet-500 px-5 py-3 text-sm font-semibold text-white"
+          >
             Analyze Startup Idea
           </button>
           <button
