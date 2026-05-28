@@ -42,6 +42,7 @@ async function checkSerp(): Promise<SourceStatus> {
       process.env.BRIGHT_DATA_SERP_ZONE,
       googleSearchUrl("LaunchPilot AI status check"),
       "json",
+      8000,
     );
     return {
       name: "SERP API",

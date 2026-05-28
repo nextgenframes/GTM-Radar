@@ -143,7 +143,7 @@ export function stripHtml(input: string): string {
 async function runSerpQueries(queries: string[]) {
   const responses = await Promise.allSettled(
     queries.map((query) =>
-      brightDataRequest<unknown>(SERP_ZONE, googleSearchUrl(query), "json"),
+      brightDataRequest<unknown>(SERP_ZONE, googleSearchUrl(query), "json", 2500),
     ),
   );
   return responses

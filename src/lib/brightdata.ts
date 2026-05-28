@@ -4,6 +4,7 @@ export async function brightDataRequest<T = unknown>(
   zone: string | undefined,
   url: string,
   format: BrightDataFormat,
+  timeoutMs = 5000,
 ): Promise<T> {
   const apiKey = process.env.BRIGHT_DATA_API_KEY;
 
@@ -23,7 +24,7 @@ export async function brightDataRequest<T = unknown>(
     },
     body: JSON.stringify({ zone, url, format }),
     cache: "no-store",
-    signal: AbortSignal.timeout(1000),
+    signal: AbortSignal.timeout(timeoutMs),
   });
 
   const contentType = response.headers.get("content-type") ?? "";
