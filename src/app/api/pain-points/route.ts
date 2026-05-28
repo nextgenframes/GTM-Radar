@@ -9,25 +9,22 @@ export async function POST(request: Request) {
     idea = normalizeIdea(body.idea);
     if (!idea) return NextResponse.json({ error: "Startup idea is required." }, { status: 400 });
 
-    let sourceUrls: string[] = [];
-    let corpus = "";
-    let sourceError: string | undefined;
+    const quickAiResult = await aiPainPoints(idea, "");
+    if (quickAiResult) {
+      return NextResponse.json({ painPoints: quickAiResult, sourceUrls: [], isDemoFallback: false });
+    }
 
     try {
       const research = await getResearchData(`${idea} complaints reviews reddit forum pain points`);
-      sourceUrls = research.sourceUrls;
-      corpus = research.corpus;
+      const aiResult = await aiPainPoints(idea, research.corpus);
+      return NextResponse.json({
+        painPoints: aiResult ?? buildPainPoints(research.corpus),
+        sourceUrls: research.sourceUrls,
+        isDemoFallback: false,
+      });
     } catch (error) {
-      sourceError = error instanceof Error ? error.message : "Source lookup failed.";
+      return NextResponse.json({ painPoints: buildPainPoints(""), sourceUrls: [], isDemoFallback: false, error: error instanceof Error ? error.message : "Source lookup failed." });
     }
-
-    const aiResult = await aiPainPoints(idea, corpus);
-    return NextResponse.json({
-      painPoints: aiResult ?? buildPainPoints(corpus),
-      sourceUrls,
-      isDemoFallback: false,
-      error: sourceError,
-    });
   } catch (error) {
     return NextResponse.json({ painPoints: buildPainPoints(""), sourceUrls: [], isDemoFallback: false, error: error instanceof Error ? error.message : "Unknown error." });
   }

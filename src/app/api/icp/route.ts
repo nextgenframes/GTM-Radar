@@ -9,22 +9,25 @@ export async function POST(request: Request) {
     idea = normalizeIdea(body.idea);
     if (!idea) return NextResponse.json({ error: "Startup idea is required." }, { status: 400 });
 
-    let corpus = "";
-    let sourceError: string | undefined;
+    const quickAiResult = await aiIcp(idea, "");
+    if (quickAiResult) {
+      return NextResponse.json({ icp: quickAiResult, isDemoFallback: false });
+    }
 
     try {
       const research = await getResearchData(idea);
-      corpus = research.corpus;
+      const aiResult = await aiIcp(idea, research.corpus);
+      return NextResponse.json({
+        icp: aiResult ?? buildIcp(idea, research.corpus),
+        isDemoFallback: false,
+      });
     } catch (error) {
-      sourceError = error instanceof Error ? error.message : "Source lookup failed.";
+      return NextResponse.json({
+        icp: buildIcp(idea),
+        isDemoFallback: false,
+        error: error instanceof Error ? error.message : "Source lookup failed.",
+      });
     }
-
-    const aiResult = await aiIcp(idea, corpus);
-    return NextResponse.json({
-      icp: aiResult ?? buildIcp(idea, corpus),
-      isDemoFallback: false,
-      error: sourceError,
-    });
   } catch (error) {
     return NextResponse.json(
       {

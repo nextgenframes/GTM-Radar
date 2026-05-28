@@ -12,26 +12,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Startup idea is required." }, { status: 400 });
     }
 
-    let sourceUrls: string[] = [];
-    let corpus = "";
-    let sourceError: string | undefined;
+    const quickAiResult = await aiResearchResult(idea, [], "");
+    if (quickAiResult) {
+      return NextResponse.json({ ...quickAiResult, isDemoFallback: false });
+    }
 
     try {
       const research = await getResearchData(idea);
-      sourceUrls = research.sourceUrls;
-      corpus = research.corpus;
+      const aiResult = await aiResearchResult(idea, research.sourceUrls, research.corpus);
+      return NextResponse.json({
+        ...(aiResult ?? buildResearchResult(idea, research.sourceUrls, research.corpus)),
+        isDemoFallback: false,
+      });
     } catch (error) {
-      sourceError = error instanceof Error ? error.message : "Source lookup failed.";
+      const message = error instanceof Error ? error.message : "Source lookup failed.";
+      return NextResponse.json({ ...buildResearchResult(idea, [], ""), isDemoFallback: false, error: message });
     }
-
-    const aiResult = await aiResearchResult(idea, sourceUrls, corpus);
-    const fallbackResult = buildResearchResult(idea, sourceUrls, corpus);
-    const result = aiResult ?? fallbackResult;
-    return NextResponse.json({
-      ...result,
-      isDemoFallback: false,
-      error: sourceError,
-    });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown research error.";
     return NextResponse.json({ ...buildResearchResult(idea, [], ""), isDemoFallback: false, error: message });
