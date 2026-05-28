@@ -23,7 +23,7 @@ export async function brightDataRequest<T = unknown>(
     },
     body: JSON.stringify({ zone, url, format }),
     cache: "no-store",
-    signal: AbortSignal.timeout(2000),
+    signal: AbortSignal.timeout(1000),
   });
 
   const contentType = response.headers.get("content-type") ?? "";

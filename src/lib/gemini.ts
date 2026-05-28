@@ -100,12 +100,12 @@ async function geminiGenerate(prompt: string, jsonMode: boolean) {
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
           temperature: 0.2,
-          maxOutputTokens: jsonMode ? 4096 : 32,
+          maxOutputTokens: jsonMode ? 2048 : 32,
           ...(jsonMode ? { responseMimeType: "application/json" } : {}),
         },
       }),
       cache: "no-store",
-      signal: AbortSignal.timeout(4500),
+      signal: AbortSignal.timeout(7500),
     },
   );
 

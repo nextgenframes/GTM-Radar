@@ -427,7 +427,7 @@ function contextPrompt(idea: string, corpus = "") {
   return [
     SYSTEM_PROMPT,
     `Startup idea: ${idea}`,
-    `Source context: ${corpus.slice(0, 6000) || "No source context available. Infer carefully from the idea."}`,
+    `Source context: ${corpus.slice(0, 1800) || "No source context available. Infer carefully from the idea."}`,
   ].join("\n\n");
 }
 
@@ -435,7 +435,9 @@ async function safeAiJson<T>(prompt: string): Promise<T | null> {
   try {
     return await geminiJson<T>(prompt);
   } catch (error) {
-    console.error("Gemini synthesis failed:", error instanceof Error ? error.message : error);
+    if (!(error instanceof Error) || !error.message.toLowerCase().includes("timeout")) {
+      console.error("Gemini synthesis failed:", error instanceof Error ? error.message : error);
+    }
     return null;
   }
 }
