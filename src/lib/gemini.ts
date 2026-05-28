@@ -70,7 +70,7 @@ async function geminiGenerate(prompt: string, jsonMode: boolean) {
         },
       }),
       cache: "no-store",
-      signal: AbortSignal.timeout(20000),
+      signal: AbortSignal.timeout(6500),
     },
   );
 

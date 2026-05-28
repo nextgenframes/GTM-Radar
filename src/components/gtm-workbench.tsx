@@ -469,6 +469,12 @@ export function GtmWorkbench({ type, title, description, placeholder, prefillIde
         </div>
       ) : null}
 
+      {result?.error && !result.isDemoFallback ? (
+        <div className="rounded-[1.5rem] border border-blue-400/20 bg-blue-400/10 p-4 text-sm text-blue-700 dark:text-blue-100">
+          Source note: {result.error}
+        </div>
+      ) : null}
+
       {result ? (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

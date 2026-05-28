@@ -141,12 +141,14 @@ export function stripHtml(input: string): string {
 }
 
 async function runSerpQueries(queries: string[]) {
-  const responses = await Promise.all(
+  const responses = await Promise.allSettled(
     queries.map((query) =>
       brightDataRequest<unknown>(SERP_ZONE, googleSearchUrl(query), "json"),
     ),
   );
-  return responses.flatMap(extractSerpItems);
+  return responses
+    .filter((result): result is PromiseFulfilledResult<unknown> => result.status === "fulfilled")
+    .flatMap((result) => extractSerpItems(result.value));
 }
 
 function serpText(items: SerpResult[]) {
@@ -162,6 +164,9 @@ export async function getResearchData(idea: string) {
     `${idea} market keywords`,
     `${idea} customer pain points`,
   ]);
+  if (!serpItems.length) {
+    throw new Error("Bright Data SERP returned no usable results.");
+  }
   const sourceUrls = uniqueUrls(serpItems);
   const pageText: string[] = [];
   return { serpItems, sourceUrls, pageText, corpus: serpText(serpItems) };
