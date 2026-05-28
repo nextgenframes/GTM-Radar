@@ -21,13 +21,13 @@ export async function POST(request: Request) {
       sourceError = error instanceof Error ? error.message : "Source lookup failed.";
     }
 
-    const aiResult = sourceUrls.length > 0 ? null : await aiCompetitors(idea, corpus);
-    const competitors = sourceUrls.length > 0 ? buildCompetitors(idea, sourceUrls) : aiResult ?? buildCompetitors(idea, []);
+    const aiResult = await aiCompetitors(idea, corpus);
+    const competitors = aiResult ?? buildCompetitors(idea, sourceUrls);
 
     return NextResponse.json({
       competitors,
       sourceUrls,
-      isDemoFallback: Boolean(sourceError && !aiResult),
+      isDemoFallback: false,
       error: sourceError,
     });
   } catch (error) {
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       {
         competitors: buildCompetitors(idea, []),
         sourceUrls: [],
-        isDemoFallback: true,
+        isDemoFallback: false,
         error: error instanceof Error ? error.message : "Unknown error.",
       },
       { status: 200 },

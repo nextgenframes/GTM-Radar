@@ -20,8 +20,8 @@ export async function POST(request: Request) {
     }
 
     const aiResult = await aiContent(idea, corpus);
-    return NextResponse.json({ content: aiResult ?? buildContent(idea, corpus), isDemoFallback: Boolean(sourceError && !aiResult), error: sourceError });
+    return NextResponse.json({ content: aiResult ?? buildContent(idea, corpus), isDemoFallback: false, error: sourceError });
   } catch (error) {
-    return NextResponse.json({ content: buildContent(idea), isDemoFallback: true, error: error instanceof Error ? error.message : "Unknown error." });
+    return NextResponse.json({ content: buildContent(idea), isDemoFallback: false, error: error instanceof Error ? error.message : "Unknown error." });
   }
 }

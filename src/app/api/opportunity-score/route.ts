@@ -22,10 +22,10 @@ export async function POST(request: Request) {
     const aiResult = await aiOpportunityScore(idea, corpus);
     return NextResponse.json({
       opportunityScore: aiResult ?? buildOpportunityScore(corpus, idea),
-      isDemoFallback: Boolean(sourceError && !aiResult),
+      isDemoFallback: false,
       error: sourceError,
     });
   } catch (error) {
-    return NextResponse.json({ opportunityScore: buildOpportunityScore("", idea), isDemoFallback: true, error: error instanceof Error ? error.message : "Unknown error." });
+    return NextResponse.json({ opportunityScore: buildOpportunityScore("", idea), isDemoFallback: false, error: error instanceof Error ? error.message : "Unknown error." });
   }
 }

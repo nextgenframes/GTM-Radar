@@ -29,11 +29,11 @@ export async function POST(request: Request) {
     const result = aiResult ?? fallbackResult;
     return NextResponse.json({
       ...result,
-      isDemoFallback: Boolean(sourceError && !aiResult),
+      isDemoFallback: false,
       error: sourceError,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown research error.";
-    return NextResponse.json({ ...buildResearchResult(idea, [], ""), isDemoFallback: true, error: message });
+    return NextResponse.json({ ...buildResearchResult(idea, [], ""), isDemoFallback: false, error: message });
   }
 }

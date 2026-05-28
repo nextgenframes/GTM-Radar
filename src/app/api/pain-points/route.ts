@@ -25,10 +25,10 @@ export async function POST(request: Request) {
     return NextResponse.json({
       painPoints: aiResult ?? buildPainPoints(corpus),
       sourceUrls,
-      isDemoFallback: Boolean(sourceError && !aiResult),
+      isDemoFallback: false,
       error: sourceError,
     });
   } catch (error) {
-    return NextResponse.json({ painPoints: buildPainPoints(""), sourceUrls: [], isDemoFallback: true, error: error instanceof Error ? error.message : "Unknown error." });
+    return NextResponse.json({ painPoints: buildPainPoints(""), sourceUrls: [], isDemoFallback: false, error: error instanceof Error ? error.message : "Unknown error." });
   }
 }

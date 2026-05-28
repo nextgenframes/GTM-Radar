@@ -114,14 +114,14 @@ export function CommandCenter() {
     const currentIdea = window.localStorage.getItem("launchpilot-current-idea");
     if (currentIdea) setIdea(currentIdea);
 
-    const latest = window.localStorage.getItem("launchpilot-latest-research");
+    const latest = window.localStorage.getItem("launchpilot-latest-v2-research");
     if (latest) {
       try {
         const stored = JSON.parse(latest) as { idea?: string; result?: ResearchResult };
         if (stored.idea) setIdea(stored.idea);
         if (stored.result && !stored.result.isDemoFallback) setAnalysis(stored.result);
       } catch {
-        window.localStorage.removeItem("launchpilot-latest-research");
+        window.localStorage.removeItem("launchpilot-latest-v2-research");
       }
     }
   }, []);
@@ -155,7 +155,7 @@ export function CommandCenter() {
       setAnalysis(result);
       window.localStorage.setItem("launchpilot-current-idea", ideaToAnalyze);
       window.localStorage.setItem(
-        "launchpilot-latest-research",
+        "launchpilot-latest-v2-research",
         JSON.stringify({ type: "research", idea: ideaToAnalyze, result, savedAt: new Date().toISOString() }),
       );
     } catch (requestError) {

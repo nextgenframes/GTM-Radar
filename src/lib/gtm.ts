@@ -572,34 +572,3 @@ export function buildResearchResult(idea: string, sourceUrls: string[], corpus: 
     isDemoFallback: false,
   };
 }
-
-export function demoResearch(idea: string, error?: string): ResearchResult {
-  const sourceUrls = [
-    "https://www.perplexity.ai/",
-    "https://www.clay.com/",
-    "https://tavily.com/",
-    "https://www.similarweb.com/",
-  ];
-  return { ...buildResearchResult(idea, sourceUrls, "ai pricing demo manual integration"), isDemoFallback: true, error };
-}
-
-export function demoData(idea: string, feature: string, error?: string): GtmPayload {
-  const sourceUrls = demoResearch(idea).sourceUrls;
-  const corpus = "ai pricing demo manual integration complaints reviews reddit forums";
-  const base = { isDemoFallback: true, error };
-
-  switch (feature) {
-    case "competitors":
-      return { competitors: buildCompetitors(idea, sourceUrls), sourceUrls, ...base };
-    case "pain-points":
-      return { painPoints: buildPainPoints(corpus), sourceUrls, ...base };
-    case "icp":
-      return { icp: buildIcp(idea, corpus), ...base };
-    case "strategy":
-      return { strategy: buildStrategy(idea, corpus), ...base };
-    case "content":
-      return { content: buildContent(idea, corpus), ...base };
-    default:
-      return { opportunityScore: buildOpportunityScore(corpus, idea), ...base };
-  }
-}

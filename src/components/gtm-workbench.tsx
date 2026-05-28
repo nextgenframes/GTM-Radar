@@ -312,7 +312,7 @@ export function GtmWorkbench({ type, title, description, placeholder, prefillIde
   const didAutoSubmit = useRef(false);
 
   function latestKey() {
-    return `launchpilot-latest-${type}`;
+    return `launchpilot-latest-v2-${type}`;
   }
 
   function persistResult(ideaToSave: string, data: ApiResult) {

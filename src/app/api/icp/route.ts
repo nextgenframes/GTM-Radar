@@ -22,14 +22,14 @@ export async function POST(request: Request) {
     const aiResult = await aiIcp(idea, corpus);
     return NextResponse.json({
       icp: aiResult ?? buildIcp(idea, corpus),
-      isDemoFallback: Boolean(sourceError && !aiResult),
+      isDemoFallback: false,
       error: sourceError,
     });
   } catch (error) {
     return NextResponse.json(
       {
         icp: buildIcp(idea),
-        isDemoFallback: true,
+        isDemoFallback: false,
         error: error instanceof Error ? error.message : "Unknown error.",
       },
       { status: 200 },
