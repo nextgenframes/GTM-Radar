@@ -111,19 +111,9 @@ export function CommandCenter() {
       setProjects(JSON.parse(saved) as SavedProject[]);
     }
 
-    const currentIdea = window.localStorage.getItem("launchpilot-current-idea");
-    if (currentIdea) setIdea(currentIdea);
-
-    const latest = window.localStorage.getItem("launchpilot-latest-v2-research");
-    if (latest) {
-      try {
-        const stored = JSON.parse(latest) as { idea?: string; result?: ResearchResult };
-        if (stored.idea) setIdea(stored.idea);
-        if (stored.result && !stored.result.isDemoFallback) setAnalysis(stored.result);
-      } catch {
-        window.localStorage.removeItem("launchpilot-latest-v2-research");
-      }
-    }
+    window.localStorage.removeItem("launchpilot-current-idea");
+    window.localStorage.removeItem("launchpilot-latest-research");
+    window.localStorage.removeItem("launchpilot-latest-v2-research");
   }, []);
 
   const dynamicSignals = analysis?.marketSignals?.length
@@ -153,11 +143,6 @@ export function CommandCenter() {
       if (!response.ok) throw new Error("error" in data && typeof data.error === "string" ? data.error : "Request failed.");
       const result = data as ResearchResult;
       setAnalysis(result);
-      window.localStorage.setItem("launchpilot-current-idea", ideaToAnalyze);
-      window.localStorage.setItem(
-        "launchpilot-latest-v2-research",
-        JSON.stringify({ type: "research", idea: ideaToAnalyze, result, savedAt: new Date().toISOString() }),
-      );
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Request failed.");
     } finally {

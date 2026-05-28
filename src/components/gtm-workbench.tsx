@@ -311,21 +311,6 @@ export function GtmWorkbench({ type, title, description, placeholder, prefillIde
   const endpoint = useMemo(() => `/api/${type}`, [type]);
   const didAutoSubmit = useRef(false);
 
-  function latestKey() {
-    return `launchpilot-latest-v2-${type}`;
-  }
-
-  function persistResult(ideaToSave: string, data: ApiResult) {
-    const stored: StoredAnalysis = {
-      type,
-      idea: ideaToSave,
-      result: data,
-      savedAt: new Date().toISOString(),
-    };
-    window.localStorage.setItem(latestKey(), JSON.stringify(stored));
-    window.localStorage.setItem("launchpilot-current-idea", ideaToSave);
-  }
-
   async function runAnalysis(ideaToAnalyze: string) {
     if (!ideaToAnalyze.trim()) return;
     setError(null);
@@ -341,7 +326,6 @@ export function GtmWorkbench({ type, title, description, placeholder, prefillIde
       if (!response.ok) throw new Error("error" in data ? data.error : "Request failed.");
       const nextResult = data as ApiResult;
       setResult(nextResult);
-      persistResult(ideaToAnalyze, nextResult);
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Request failed.");
     } finally {
@@ -350,25 +334,9 @@ export function GtmWorkbench({ type, title, description, placeholder, prefillIde
   }
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(latestKey());
-    if (!prefillIdea && saved) {
-      try {
-        const stored = JSON.parse(saved) as StoredAnalysis;
-        if (stored.result?.isDemoFallback) {
-          window.localStorage.removeItem(latestKey());
-        } else {
-          setIdea(stored.idea);
-          setResult(stored.result);
-        }
-      } catch {
-        window.localStorage.removeItem(latestKey());
-      }
-    }
-
-    if (!prefillIdea) {
-      const currentIdea = window.localStorage.getItem("launchpilot-current-idea");
-      if (currentIdea) setIdea((existing) => existing || currentIdea);
-    }
+    window.localStorage.removeItem(`launchpilot-latest-${type}`);
+    window.localStorage.removeItem(`launchpilot-latest-v2-${type}`);
+    window.localStorage.removeItem("launchpilot-current-idea");
 
     if (prefillIdea && !didAutoSubmit.current) {
       didAutoSubmit.current = true;
