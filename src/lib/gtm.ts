@@ -566,11 +566,6 @@ Return JSON shape:
   };
 }
 
-export function isGenericResearchResult(result: ResearchResult): boolean {
-  return result.positioningIdeas.some((idea) => idea.includes("fastest path")) ||
-    result.marketSignals.some((signal) => signal.includes("Conversion paths need manual validation"));
-}
-
 export function buildResearchResult(idea: string, sourceUrls: string[], corpus: string): ResearchResult {
   return {
     competitors: buildCompetitors(idea, sourceUrls).map((competitor) => competitor.name),

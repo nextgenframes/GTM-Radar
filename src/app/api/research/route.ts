@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { aiResearchResult, buildResearchResult, isGenericResearchResult, getResearchData, normalizeIdea } from "@/lib/gtm";
+import { aiResearchResult, buildResearchResult, getResearchData, normalizeIdea } from "@/lib/gtm";
 
 export async function POST(request: Request) {
   let idea = "your startup idea";
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     const result = aiResult ?? fallbackResult;
     return NextResponse.json({
       ...result,
-      isDemoFallback: Boolean(!aiResult && isGenericResearchResult(result)),
+      isDemoFallback: !aiResult,
       error: sourceError,
     });
   } catch (error) {
