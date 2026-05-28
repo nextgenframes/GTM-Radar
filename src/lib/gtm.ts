@@ -443,7 +443,8 @@ function contextPrompt(idea: string, corpus = "") {
 async function safeAiJson<T>(prompt: string): Promise<T | null> {
   try {
     return await geminiJson<T>(prompt);
-  } catch {
+  } catch (error) {
+    console.error("Gemini synthesis failed:", error instanceof Error ? error.message : error);
     return null;
   }
 }

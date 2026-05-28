@@ -34,7 +34,7 @@ function parseJson<T>(text: string): T {
 }
 
 export function geminiModelName(): string {
-  const configured = (process.env.GEMINI_MODEL ?? "gemini-2.5-flash").replace(/^models\//, "");
+  const configured = (process.env.GEMINI_MODEL ?? process.env.GOOGLE_GENERATIVE_AI_MODEL ?? "gemini-2.5-flash").replace(/^models\//, "");
 
   if (configured === "gemini-2.0-flash") {
     return "gemini-2.5-flash";
@@ -43,10 +43,14 @@ export function geminiModelName(): string {
   return configured;
 }
 
+function geminiApiKey(): string | undefined {
+  return process.env.GEMINI_API_KEY ?? process.env.GOOGLE_GENERATIVE_AI_API_KEY ?? process.env.GOOGLE_API_KEY;
+}
+
 async function geminiGenerate(prompt: string, jsonMode: boolean) {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = geminiApiKey();
   if (!apiKey) {
-    throw new Error("Missing GEMINI_API_KEY environment variable.");
+    throw new Error("Missing Gemini API key. Set GEMINI_API_KEY, GOOGLE_GENERATIVE_AI_API_KEY, or GOOGLE_API_KEY.");
   }
 
   const response = await fetch(
