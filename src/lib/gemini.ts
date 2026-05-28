@@ -105,7 +105,7 @@ async function geminiGenerate(prompt: string, jsonMode: boolean) {
         },
       }),
       cache: "no-store",
-      signal: AbortSignal.timeout(6500),
+      signal: AbortSignal.timeout(4500),
     },
   );
 
@@ -130,16 +130,5 @@ Return compact valid JSON only. No markdown. No prose. Escape all quotes inside 
   const text = await geminiGenerate(strictPrompt, true);
   if (!text) return null;
 
-  try {
-    return parseJson<T>(text);
-  } catch (error) {
-    const retryText = await geminiGenerate(`${strictPrompt}
-
-Previous output was invalid JSON with this parser error:
-${error instanceof Error ? error.message : "Unknown parse error"}
-
-Rewrite the response as valid minified JSON only.`, true);
-    if (!retryText) return null;
-    return parseJson<T>(retryText);
-  }
+  return parseJson<T>(text);
 }
