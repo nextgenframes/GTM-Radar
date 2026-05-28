@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { aiResearchResult, buildResearchResult, getResearchData, normalizeIdea } from "@/lib/gtm";
+import { aiResearchResult, buildResearchResult, isGenericResearchResult, getResearchData, normalizeIdea } from "@/lib/gtm";
 
 export async function POST(request: Request) {
   let idea = "your startup idea";
@@ -25,9 +25,11 @@ export async function POST(request: Request) {
     }
 
     const aiResult = await aiResearchResult(idea, sourceUrls, corpus);
+    const fallbackResult = buildResearchResult(idea, sourceUrls, corpus);
+    const result = aiResult ?? fallbackResult;
     return NextResponse.json({
-      ...(aiResult ?? buildResearchResult(idea, sourceUrls, corpus)),
-      isDemoFallback: Boolean(sourceError && !aiResult),
+      ...result,
+      isDemoFallback: Boolean(!aiResult && isGenericResearchResult(result)),
       error: sourceError,
     });
   } catch (error) {

@@ -14,10 +14,11 @@ function readContent(payload: OpenRouterResponse): string {
 }
 
 function parseJson<T>(text: string): T {
+  const cleaned = text.replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
   try {
-    return JSON.parse(text) as T;
+    return JSON.parse(cleaned) as T;
   } catch {
-    const match = text.match(/\{[\s\S]*\}/);
+    const match = cleaned.match(/\{[\s\S]*\}/);
     if (!match) throw new Error("OpenRouter response did not contain JSON.");
     return JSON.parse(match[0]) as T;
   }
@@ -47,7 +48,7 @@ async function openRouterChat(prompt: string, jsonMode: boolean) {
       temperature: 0.2,
     }),
     cache: "no-store",
-    signal: AbortSignal.timeout(12000),
+    signal: AbortSignal.timeout(20000),
   });
 
   const payload = (await response.json()) as OpenRouterResponse;

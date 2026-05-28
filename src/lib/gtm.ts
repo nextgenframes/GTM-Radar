@@ -88,7 +88,7 @@ const SERP_ZONE = process.env.BRIGHT_DATA_SERP_ZONE;
 const UNLOCKER_ZONE = process.env.BRIGHT_DATA_UNLOCKER_ZONE;
 
 const SYSTEM_PROMPT =
-  "You are a practical GTM strategist. Return only valid JSON. Make every item specific to the startup idea and source context. Avoid generic SaaS filler.";
+  "You are a practical GTM strategist. Return only valid JSON. Make every item specific to the startup idea. If source context is thin, infer from the market category and say concrete buyer, channel, and competitor details. Avoid generic SaaS filler.";
 
 export function normalizeIdea(input: unknown): string {
   return typeof input === "string" ? input.trim().slice(0, 240) : "";
@@ -564,6 +564,11 @@ Return JSON shape:
     recommendedGtmStrategy: asStrings(data.recommendedGtmStrategy, fallback.recommendedGtmStrategy),
     isDemoFallback: false,
   };
+}
+
+export function isGenericResearchResult(result: ResearchResult): boolean {
+  return result.positioningIdeas.some((idea) => idea.includes("fastest path")) ||
+    result.marketSignals.some((signal) => signal.includes("Conversion paths need manual validation"));
 }
 
 export function buildResearchResult(idea: string, sourceUrls: string[], corpus: string): ResearchResult {
