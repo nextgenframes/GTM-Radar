@@ -1,6 +1,6 @@
 import { AppShell } from "@/components/app-shell";
 
-const envVars = ["GEMINI_API_KEY", "GEMINI_MODEL", "BRIGHT_DATA_API_KEY", "BRIGHT_DATA_SERP_ZONE", "BRIGHT_DATA_UNLOCKER_ZONE"];
+const envVars = ["GEMINI_API_KEY", "GEMINI_MODEL", "BRIGHT_DATA_API_KEY", "BRIGHT_DATA_SERP_ZONE"];
 
 export default function SettingsPage() {
   return (

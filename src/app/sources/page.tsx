@@ -5,7 +5,7 @@ export default function SourcesPage() {
   return (
     <AppShell
       title="Sources"
-      description="Monitor the live tools used for GTM analysis: Gemini API, Bright Data SERP API, and Bright Data Web Unlocker."
+      description="Monitor the live tools used for GTM analysis: Gemini API and Bright Data SERP API."
     >
       <SourcesPanel />
     </AppShell>

@@ -99,7 +99,7 @@ export function SourcesPanel() {
               {payload?.overall === "online" ? "All systems online" : "Source check needs attention"}
             </h2>
             <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-              Gemini synthesizes analysis. Bright Data SERP and Web Unlocker collect source context.
+              Gemini synthesizes analysis. Bright Data SERP collects source context.
             </p>
           </div>
           <button
@@ -146,7 +146,7 @@ export function SourcesPanel() {
         ))}
 
         {isLoading && !payload
-          ? ["Gemini API", "SERP API", "Web Unlocker"].map((name) => (
+          ? ["Gemini API", "SERP API"].map((name) => (
               <section key={name} className="h-48 rounded-[1.5rem] shimmer" />
             ))
           : null}

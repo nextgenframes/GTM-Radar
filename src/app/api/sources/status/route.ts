@@ -55,27 +55,8 @@ async function checkSerp(): Promise<SourceStatus> {
   }
 }
 
-async function checkUnlocker(): Promise<SourceStatus> {
-  try {
-    await brightDataRequest<string>(
-      process.env.BRIGHT_DATA_UNLOCKER_ZONE,
-      "https://example.com",
-      "raw",
-    );
-    return {
-      name: "Web Unlocker",
-      key: "unlocker",
-      purpose: "Fetches public competitor pages for source context.",
-      status: "online",
-      detail: "Bright Data Web Unlocker zone responded.",
-    };
-  } catch (error) {
-    return offline("Web Unlocker", "unlocker", "Fetches public competitor pages for source context.", error);
-  }
-}
-
 export async function GET() {
-  const sources = await Promise.all([checkGemini(), checkSerp(), checkUnlocker()]);
+  const sources = await Promise.all([checkGemini(), checkSerp()]);
   const overall = sources.every((source) => source.status === "online") ? "online" : "offline";
 
   return NextResponse.json({

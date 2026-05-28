@@ -85,7 +85,6 @@ export type GtmPayload =
   | { content: ContentPack; isDemoFallback: boolean; error?: string };
 
 const SERP_ZONE = process.env.BRIGHT_DATA_SERP_ZONE;
-const UNLOCKER_ZONE = process.env.BRIGHT_DATA_UNLOCKER_ZONE;
 
 const SYSTEM_PROMPT =
   "You are a practical GTM strategist. Return only valid JSON. Make every item specific to the startup idea. If source context is thin, infer from the market category and say concrete buyer, channel, and competitor details. Avoid generic SaaS filler.";
@@ -150,19 +149,6 @@ async function runSerpQueries(queries: string[]) {
   return responses.flatMap(extractSerpItems);
 }
 
-async function scrapeUrls(urls: string[]) {
-  const scraped = await Promise.allSettled(
-    urls.map((url) => brightDataRequest<string>(UNLOCKER_ZONE, url, "raw")),
-  );
-
-  return scraped
-    .filter(
-      (result): result is PromiseFulfilledResult<string> =>
-        result.status === "fulfilled",
-    )
-    .map((result) => stripHtml(String(result.value)).slice(0, 1800));
-}
-
 function serpText(items: SerpResult[]) {
   return items
     .map((item) => `${item.title ?? ""} ${item.snippet ?? item.description ?? ""}`)
@@ -177,8 +163,8 @@ export async function getResearchData(idea: string) {
     `${idea} customer pain points`,
   ]);
   const sourceUrls = uniqueUrls(serpItems);
-  const pageText = await scrapeUrls(sourceUrls.slice(0, 2));
-  return { serpItems, sourceUrls, pageText, corpus: `${serpText(serpItems)} ${pageText.join(" ")}` };
+  const pageText: string[] = [];
+  return { serpItems, sourceUrls, pageText, corpus: serpText(serpItems) };
 }
 
 function fallbackCompetitorUrls(idea: string): string[] {
