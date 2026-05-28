@@ -27,10 +27,45 @@ function parseJson<T>(text: string): T {
   try {
     return JSON.parse(cleaned) as T;
   } catch {
-    const match = cleaned.match(/\{[\s\S]*\}/);
-    if (!match) throw new Error("Gemini response did not contain JSON.");
-    return JSON.parse(match[0]) as T;
+    const objectText = firstJsonObject(cleaned);
+    if (!objectText) throw new Error("Gemini response did not contain JSON.");
+    return JSON.parse(objectText) as T;
   }
+}
+
+function firstJsonObject(text: string): string | null {
+  const start = text.indexOf("{");
+  if (start === -1) return null;
+
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+
+  for (let index = start; index < text.length; index += 1) {
+    const char = text[index];
+
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+
+    if (char === "\\") {
+      escaped = true;
+      continue;
+    }
+
+    if (char === "\"") {
+      inString = !inString;
+      continue;
+    }
+
+    if (inString) continue;
+    if (char === "{") depth += 1;
+    if (char === "}") depth -= 1;
+    if (depth === 0) return text.slice(start, index + 1);
+  }
+
+  return null;
 }
 
 export function geminiModelName(): string {
@@ -65,7 +100,7 @@ async function geminiGenerate(prompt: string, jsonMode: boolean) {
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
           temperature: 0.2,
-          maxOutputTokens: jsonMode ? 1400 : 32,
+          maxOutputTokens: jsonMode ? 4096 : 32,
           ...(jsonMode ? { responseMimeType: "application/json" } : {}),
         },
       }),
@@ -89,8 +124,22 @@ export async function geminiStatus() {
 }
 
 export async function geminiJson<T>(prompt: string): Promise<T | null> {
-  const text = await geminiGenerate(`${prompt}\n\nReturn only valid JSON. No markdown. No prose.`, true);
+  const strictPrompt = `${prompt}
+
+Return compact valid JSON only. No markdown. No prose. Escape all quotes inside strings. Do not use line breaks inside string values.`;
+  const text = await geminiGenerate(strictPrompt, true);
   if (!text) return null;
 
-  return parseJson<T>(text);
+  try {
+    return parseJson<T>(text);
+  } catch (error) {
+    const retryText = await geminiGenerate(`${strictPrompt}
+
+Previous output was invalid JSON with this parser error:
+${error instanceof Error ? error.message : "Unknown parse error"}
+
+Rewrite the response as valid minified JSON only.`, true);
+    if (!retryText) return null;
+    return parseJson<T>(retryText);
+  }
 }
