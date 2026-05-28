@@ -99,7 +99,7 @@ export function SourcesPanel() {
               {payload?.overall === "online" ? "All systems online" : "Source check needs attention"}
             </h2>
             <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-              OpenRouter synthesizes analysis. Bright Data SERP and Web Unlocker collect source context.
+              Gemini synthesizes analysis. Bright Data SERP and Web Unlocker collect source context.
             </p>
           </div>
           <button
@@ -115,7 +115,7 @@ export function SourcesPanel() {
 
         {payload ? (
           <p className="mt-4 text-xs text-slate-500 dark:text-slate-400">
-            Last checked {new Date(payload.checkedAt).toLocaleString()} · OpenRouter model {payload.model}
+            Last checked {new Date(payload.checkedAt).toLocaleString()} · Gemini model {payload.model}
           </p>
         ) : null}
         {error ? <p className="mt-4 text-sm text-red-600 dark:text-red-200">{error}</p> : null}
@@ -146,7 +146,7 @@ export function SourcesPanel() {
         ))}
 
         {isLoading && !payload
-          ? ["OpenRouter API", "SERP API", "Web Unlocker"].map((name) => (
+          ? ["Gemini API", "SERP API", "Web Unlocker"].map((name) => (
               <section key={name} className="h-48 rounded-[1.5rem] shimmer" />
             ))
           : null}

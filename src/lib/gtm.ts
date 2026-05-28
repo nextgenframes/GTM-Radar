@@ -1,5 +1,5 @@
 import { brightDataRequest } from "@/lib/brightdata";
-import { openRouterJson } from "@/lib/openrouter";
+import { geminiJson } from "@/lib/gemini";
 
 export type SerpResult = {
   title?: string;
@@ -442,7 +442,7 @@ function contextPrompt(idea: string, corpus = "") {
 
 async function safeAiJson<T>(prompt: string): Promise<T | null> {
   try {
-    return await openRouterJson<T>(prompt);
+    return await geminiJson<T>(prompt);
   } catch {
     return null;
   }

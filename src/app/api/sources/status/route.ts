@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { brightDataRequest } from "@/lib/brightdata";
-import { openRouterModelName, openRouterStatus } from "@/lib/openrouter";
+import { geminiModelName, geminiStatus } from "@/lib/gemini";
 import { googleSearchUrl } from "@/lib/gtm";
 
 type SourceStatus = {
@@ -21,18 +21,18 @@ function offline(name: string, key: string, purpose: string, error: unknown): So
   };
 }
 
-async function checkOpenRouter(): Promise<SourceStatus> {
+async function checkGemini(): Promise<SourceStatus> {
   try {
-    const { model } = await openRouterStatus();
+    const { model } = await geminiStatus();
     return {
-      name: "OpenRouter API",
-      key: "openrouter",
+      name: "Gemini API",
+      key: "gemini",
       purpose: "Synthesizes Bright Data findings into GTM cards.",
       status: "online",
       detail: `Using ${model}.`,
     };
   } catch (error) {
-    return offline("OpenRouter API", "openrouter", "Synthesizes Bright Data findings into GTM cards.", error);
+    return offline("Gemini API", "gemini", "Synthesizes Bright Data findings into GTM cards.", error);
   }
 }
 
@@ -75,13 +75,13 @@ async function checkUnlocker(): Promise<SourceStatus> {
 }
 
 export async function GET() {
-  const sources = await Promise.all([checkOpenRouter(), checkSerp(), checkUnlocker()]);
+  const sources = await Promise.all([checkGemini(), checkSerp(), checkUnlocker()]);
   const overall = sources.every((source) => source.status === "online") ? "online" : "offline";
 
   return NextResponse.json({
     overall,
     checkedAt: new Date().toISOString(),
-    model: openRouterModelName(),
+    model: geminiModelName(),
     sources,
   });
 }
