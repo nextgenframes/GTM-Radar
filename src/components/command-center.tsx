@@ -119,7 +119,7 @@ export function CommandCenter() {
       try {
         const stored = JSON.parse(latest) as { idea?: string; result?: ResearchResult };
         if (stored.idea) setIdea(stored.idea);
-        if (stored.result) setAnalysis(stored.result);
+        if (stored.result && !stored.result.isDemoFallback) setAnalysis(stored.result);
       } catch {
         window.localStorage.removeItem("launchpilot-latest-research");
       }

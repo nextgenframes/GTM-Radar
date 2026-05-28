@@ -354,8 +354,12 @@ export function GtmWorkbench({ type, title, description, placeholder, prefillIde
     if (!prefillIdea && saved) {
       try {
         const stored = JSON.parse(saved) as StoredAnalysis;
-        setIdea(stored.idea);
-        setResult(stored.result);
+        if (stored.result?.isDemoFallback) {
+          window.localStorage.removeItem(latestKey());
+        } else {
+          setIdea(stored.idea);
+          setResult(stored.result);
+        }
       } catch {
         window.localStorage.removeItem(latestKey());
       }

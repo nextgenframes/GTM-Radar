@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { aiOpportunityScore, buildOpportunityScore, demoData, getResearchData, normalizeIdea } from "@/lib/gtm";
+import { aiOpportunityScore, buildOpportunityScore, getResearchData, normalizeIdea } from "@/lib/gtm";
 
 export async function POST(request: Request) {
   let idea = "your startup idea";
@@ -9,12 +9,23 @@ export async function POST(request: Request) {
     idea = normalizeIdea(body.idea);
     if (!idea) return NextResponse.json({ error: "Startup idea is required." }, { status: 400 });
 
-    const { corpus } = await getResearchData(idea);
+    let corpus = "";
+    let sourceError: string | undefined;
+
+    try {
+      const research = await getResearchData(idea);
+      corpus = research.corpus;
+    } catch (error) {
+      sourceError = error instanceof Error ? error.message : "Source lookup failed.";
+    }
+
+    const aiResult = await aiOpportunityScore(idea, corpus);
     return NextResponse.json({
-      opportunityScore: (await aiOpportunityScore(idea, corpus)) ?? buildOpportunityScore(corpus, idea),
-      isDemoFallback: false,
+      opportunityScore: aiResult ?? buildOpportunityScore(corpus, idea),
+      isDemoFallback: Boolean(sourceError && !aiResult),
+      error: sourceError,
     });
   } catch (error) {
-    return NextResponse.json(demoData(idea, "opportunity-score", error instanceof Error ? error.message : "Unknown error."));
+    return NextResponse.json({ opportunityScore: buildOpportunityScore("", idea), isDemoFallback: true, error: error instanceof Error ? error.message : "Unknown error." });
   }
 }

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { aiPainPoints, buildPainPoints, demoData, getResearchData, normalizeIdea } from "@/lib/gtm";
+import { aiPainPoints, buildPainPoints, getResearchData, normalizeIdea } from "@/lib/gtm";
 
 export async function POST(request: Request) {
   let idea = "your startup idea";
@@ -9,13 +9,26 @@ export async function POST(request: Request) {
     idea = normalizeIdea(body.idea);
     if (!idea) return NextResponse.json({ error: "Startup idea is required." }, { status: 400 });
 
-    const { sourceUrls, corpus } = await getResearchData(`${idea} complaints reviews reddit forum pain points`);
+    let sourceUrls: string[] = [];
+    let corpus = "";
+    let sourceError: string | undefined;
+
+    try {
+      const research = await getResearchData(`${idea} complaints reviews reddit forum pain points`);
+      sourceUrls = research.sourceUrls;
+      corpus = research.corpus;
+    } catch (error) {
+      sourceError = error instanceof Error ? error.message : "Source lookup failed.";
+    }
+
+    const aiResult = await aiPainPoints(idea, corpus);
     return NextResponse.json({
-      painPoints: (await aiPainPoints(idea, corpus)) ?? buildPainPoints(corpus),
+      painPoints: aiResult ?? buildPainPoints(corpus),
       sourceUrls,
-      isDemoFallback: false,
+      isDemoFallback: Boolean(sourceError && !aiResult),
+      error: sourceError,
     });
   } catch (error) {
-    return NextResponse.json(demoData(idea, "pain-points", error instanceof Error ? error.message : "Unknown error."));
+    return NextResponse.json({ painPoints: buildPainPoints(""), sourceUrls: [], isDemoFallback: true, error: error instanceof Error ? error.message : "Unknown error." });
   }
 }

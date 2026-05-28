@@ -45,7 +45,6 @@ async function openRouterChat(prompt: string, jsonMode: boolean) {
       model: openRouterModelName(),
       messages: [{ role: "user", content: prompt }],
       temperature: 0.2,
-      ...(jsonMode ? { response_format: { type: "json_object" } } : {}),
     }),
     cache: "no-store",
     signal: AbortSignal.timeout(12000),
@@ -61,12 +60,12 @@ async function openRouterChat(prompt: string, jsonMode: boolean) {
 }
 
 export async function openRouterStatus() {
-  await openRouterChat("Reply with exactly: ok", false);
+  await openRouterJson<{ status: string }>('Return only JSON: {"status":"ok"}');
   return { model: openRouterModelName() };
 }
 
 export async function openRouterJson<T>(prompt: string): Promise<T | null> {
-  const text = await openRouterChat(prompt, true);
+  const text = await openRouterChat(`${prompt}\n\nReturn only valid JSON. No markdown. No prose.`, true);
   if (!text) return null;
 
   return parseJson<T>(text);
