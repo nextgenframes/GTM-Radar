@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     const result = aiResult ?? fallbackResult;
     return NextResponse.json({
       ...result,
-      isDemoFallback: !aiResult,
+      isDemoFallback: Boolean(sourceError && !aiResult),
       error: sourceError,
     });
   } catch (error) {
