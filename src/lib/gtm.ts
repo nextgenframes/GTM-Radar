@@ -106,18 +106,47 @@ export function domainName(url: string): string {
 }
 
 export function extractSerpItems(payload: unknown): SerpResult[] {
+  if (typeof payload === "string") {
+    try {
+      return extractSerpItems(JSON.parse(payload));
+    } catch {
+      return [];
+    }
+  }
+
+  if (Array.isArray(payload)) {
+    return payload.filter(isSerpResult);
+  }
+
   if (!payload || typeof payload !== "object") {
     return [];
   }
 
   const data = payload as Record<string, unknown>;
-  for (const candidate of [data.organic, data.organic_results, data.results, data.items]) {
+  for (const candidate of [data.organic, data.organic_results, data.results, data.items, data.body, data.response, data.content]) {
     if (Array.isArray(candidate)) {
-      return candidate as SerpResult[];
+      const items = candidate.filter(isSerpResult);
+      if (items.length) return items;
+    }
+
+    const nestedItems = extractSerpItems(candidate);
+    if (nestedItems.length) return nestedItems;
+  }
+
+  for (const value of Object.values(data)) {
+    const nestedItems = extractSerpItems(value);
+    if (nestedItems.length) {
+      return nestedItems;
     }
   }
 
   return [];
+}
+
+function isSerpResult(value: unknown): value is SerpResult {
+  if (!value || typeof value !== "object") return false;
+  const item = value as SerpResult;
+  return Boolean(item.title || item.link || item.url || item.snippet || item.description);
 }
 
 export function uniqueUrls(results: SerpResult[]): string[] {
@@ -143,7 +172,7 @@ export function stripHtml(input: string): string {
 async function runSerpQueries(queries: string[]) {
   const responses = await Promise.allSettled(
     queries.map((query) =>
-      brightDataRequest<unknown>(SERP_ZONE, googleSearchUrl(query), "json", 2500),
+      brightDataRequest<unknown>(SERP_ZONE, googleSearchUrl(query), "json", 3500, "parsed_light"),
     ),
   );
   return responses

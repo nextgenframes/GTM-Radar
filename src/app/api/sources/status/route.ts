@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { brightDataRequest } from "@/lib/brightdata";
 import { geminiModelName, geminiStatus } from "@/lib/gemini";
-import { googleSearchUrl } from "@/lib/gtm";
+import { extractSerpItems, googleSearchUrl } from "@/lib/gtm";
 
 type SourceStatus = {
   name: string;
@@ -38,18 +38,23 @@ async function checkGemini(): Promise<SourceStatus> {
 
 async function checkSerp(): Promise<SourceStatus> {
   try {
-    await brightDataRequest<unknown>(
+    const payload = await brightDataRequest<unknown>(
       process.env.BRIGHT_DATA_SERP_ZONE,
       googleSearchUrl("LaunchPilot AI status check"),
       "json",
       8000,
+      "parsed_light",
     );
+    const resultCount = extractSerpItems(payload).length;
+    if (!resultCount) {
+      throw new Error("SERP API responded, but no parsed results were found. Check zone type/name and parsed_light support.");
+    }
     return {
       name: "SERP API",
       key: "serp",
       purpose: "Finds competitors, keywords, and market search signals.",
       status: "online",
-      detail: "Bright Data SERP zone responded.",
+      detail: `Bright Data SERP zone responded with ${resultCount} parsed results.`,
     };
   } catch (error) {
     return offline("SERP API", "serp", "Finds competitors, keywords, and market search signals.", error);

@@ -5,6 +5,7 @@ export async function brightDataRequest<T = unknown>(
   url: string,
   format: BrightDataFormat,
   timeoutMs = 5000,
+  dataFormat?: "parsed_light",
 ): Promise<T> {
   const apiKey = process.env.BRIGHT_DATA_API_KEY;
 
@@ -22,7 +23,7 @@ export async function brightDataRequest<T = unknown>(
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ zone, url, format }),
+    body: JSON.stringify({ zone, url, format, ...(dataFormat ? { data_format: dataFormat } : {}) }),
     cache: "no-store",
     signal: AbortSignal.timeout(timeoutMs),
   });
